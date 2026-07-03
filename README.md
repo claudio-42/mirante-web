@@ -1,81 +1,91 @@
-# Mirante — Web (Frontend)
+# Mirante Web
 
-Interface em **React (Vite)** que consome a [API do Mirante](https://github.com/claudio-42/mirante-api) e apresenta um **mapa interativo** com as empresas cobertas. Ao clicar em uma empresa no mapa, abre um painel de análise financeira completo: KPIs, diagnóstico automático, indicadores de liquidez e endividamento, e demonstrativos contábeis (DRE, Balanço Patrimonial).
+Interface em React do Mirante: uma plataforma para explorar indicadores financeiros de companhias abertas da B3 (dados CVM/DFP). Uma landing page com mapa interativo do Brasil permite escolher a empresa; ao selecioná-la, um dashboard com abas apresenta KPIs, gráficos e um diagnóstico automático por aspecto financeiro.
 
-🔗 Deploy: [mirante-web.vercel.app](https://mirante-web.vercel.app)
+**Demo ao vivo:** https://mirante-web.vercel.app
 
-## Funcionalidades
+> Hospedado na Vercel. Os dados vêm da API (Render) e do banco (Neon), ambos em plano gratuito que hiberna quando ocioso; a primeira carga pode levar de 30 a 60 segundos.
 
-- **Mapa interativo** das empresas cobertas, com dados geográficos vindos da API (`/api/mapa`)
-- Ao clicar numa empresa: **KPIs** e **diagnóstico executivo** gerados automaticamente
-- **Indicadores** de liquidez e endividamento, com série histórica em gráfico
-- **Demonstrativos contábeis**: DRE, Balanço Patrimonial (BP) e DFC
-- Busca e filtro de empresas por setor
-- Tema claro/escuro
+Este projeto faz parte de um sistema em três camadas:
 
-## Stack
-
-- **React 19 + Vite** — base da aplicação
-- **Recharts** — gráficos dos indicadores
-- **d3-geo** — projeção geográfica usada no mapa
-- **Framer Motion** — transições e animações
-- **oxlint** — lint
-
-## Pré-requisitos
-
-- **Node.js** 18 ou superior
-- A [API (mirante-api)](https://github.com/claudio-42/mirante-api) rodando — localmente em `http://127.0.0.1:8000`, ou apontada via variável de ambiente (veja abaixo)
-
-## Como rodar (desenvolvimento)
-
-```bash
-git clone https://github.com/claudio-42/mirante-web.git
-cd mirante-web
-npm install
-npm run dev
-```
-
-O Vite vai mostrar um endereço, normalmente **http://localhost:5173**. Abra esse endereço no navegador.
-
-> São dois servidores ao mesmo tempo: a API na porta 8000 e o site na 5173. Precisa de dois terminais abertos — um para cada.
-
-## Configuração para deploy
-
-Em produção, o site precisa saber a URL pública da API. Crie um arquivo `.env` na raiz com:
-
-```
-VITE_API_URL=https://sua-api.onrender.com
-```
-
-Sem esse arquivo, ele usa `http://127.0.0.1:8000` (desenvolvimento local).
-
-## Estrutura (resumo)
-
-```
-mirante-web/
-├── index.html
-├── package.json
-├── vite.config.js
-├── public/
-└── src/
-    ├── main.jsx        # ponto de entrada
-    ├── App.jsx          # estado, busca na API e layout geral
-    ├── api.js            # endereço e chamadas da API
-    ├── styles.css        # estilos (tema claro/escuro)
-    └── components/
-        ├── Sidebar.jsx    # busca + filtro de setor + lista de empresas
-        ├── Header.jsx      # marca Mirante + empresa selecionada + botão de tema
-        ├── Cards.jsx        # KPIs e bloco de diagnóstico
-        └── IndicatorCard.jsx # cartão de indicador com mini gráfico
-```
-
-> Não consegui listar o conteúdo de `src/components` diretamente pelo GitHub (bloqueado para leitura automática). Se o mapa e os demonstrativos (DRE/BP) estiverem em arquivos com nomes diferentes dos listados acima, me avisa os nomes reais que eu ajusto essa árvore.
-
-## Próximos passos
-
-- **Deploy da API** em produção (Render), apontando `VITE_API_URL` para ela.
-- Ampliar a cobertura de empresas conforme a API for evoluindo.
+- **Pipeline de dados (CVM):** [bigdata_for_finance](https://github.com/claudio-42/bigdata_for_finance)
+- **API (FastAPI):** [mirante-api](https://github.com/claudio-42/mirante-api) — fornece os dados a este front
+- **Front-end (este repositório):** consome a API e desenha a interface
 
 ---
 
-Projeto pessoal desenvolvido por [claudio-42](https://github.com/claudio-42).
+## Funcionalidades
+
+- **Landing com mapa interativo do Brasil:** cada empresa é um ponto na sede, com busca por nome/CNPJ, filtro por setor e zoom (scroll ou pinça).
+- **Dashboard por empresa, em abas:** Visão Geral, Liquidez, Endividamento, Margens e Rentabilidade, Atividade e Ciclos, Fleuriet, e os demonstrativos Balanço, DRE e DFC.
+- **Diagnóstico automático:** leitura textual dos indicadores, cruzando tendências e o contexto do setor da empresa (sem uso de IA).
+- **Tema claro/escuro.**
+
+---
+
+## Tecnologias
+
+React (Vite), Recharts (gráficos), d3-geo (projeção do mapa), Framer Motion (animações). Deploy na Vercel.
+
+---
+
+## Como rodar localmente
+
+**Pré-requisitos:** Node.js 18+ e uma instância da API rodando (a versão publicada em [mirante-api](https://github.com/claudio-42/mirante-api), ou uma local).
+
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+2. Crie um arquivo `.env` na raiz apontando para a API (sem barra no final):
+   ```
+   VITE_API_URL=https://mirante-api.onrender.com
+   ```
+   (Para uma API local, use `http://127.0.0.1:8000`.)
+3. Rode em modo de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+4. Acesse o endereço que o Vite exibir (normalmente `http://localhost:5173`).
+
+---
+
+## Estrutura
+
+```
+mirante-web/
+├── src/
+│   ├── components/
+│   │   ├── Landing.jsx          Landing (mapa, busca, filtros)
+│   │   ├── BrazilMap.jsx        Mapa do Brasil com zoom e pontos
+│   │   ├── DashboardTabs.jsx    Abas da análise por empresa
+│   │   ├── DemonstrativoTab.jsx Tabelas de BP/DRE/DFC
+│   │   ├── Sidebar.jsx          Seletor de empresas
+│   │   ├── Header.jsx           Cabeçalho e tema
+│   │   ├── Cards.jsx            KPIs e blocos de diagnóstico
+│   │   ├── IndicatorCard.jsx    Cartão de indicador com mini gráfico
+│   │   └── ThemeToggle.jsx      Alternador de tema
+│   ├── data/brazil-states.json  GeoJSON do Brasil (simplificado)
+│   ├── api.js                   Chamadas à API
+│   ├── format.js               Formatação de valores
+│   ├── styles.css              Estilos e paleta
+│   ├── App.jsx
+│   └── main.jsx
+├── index.html
+├── package.json
+├── vite.config.js
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Deploy (Vercel)
+
+A Vercel detecta o Vite automaticamente. A única configuração necessária é a variável de ambiente:
+
+- **`VITE_API_URL`** = URL pública da API (sem barra no final).
+
+---
+
+*Parte do projeto Mirante, desenvolvido a partir da disciplina de Big Data for Finance. Dados públicos da CVM; finalidade acadêmica, não constitui recomendação de investimento.*
