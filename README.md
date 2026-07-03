@@ -4,6 +4,8 @@ Interface em React do Mirante: uma plataforma para explorar indicadores financei
 
 **Demo ao vivo:** https://mirante-web.vercel.app
 
+<img width="1919" height="943" alt="Screenshot_73" src="https://github.com/user-attachments/assets/68ffc017-9cb7-413a-b702-49b20198589d" />
+
 > Hospedado na Vercel. Os dados vêm da API (Render) e do banco (Neon), ambos em plano gratuito que hiberna quando ocioso; a primeira carga pode levar de 30 a 60 segundos.
 
 Este projeto faz parte de um sistema em três camadas:
